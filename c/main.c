@@ -34,6 +34,7 @@ void process_webcam_frames()
     IplImage* frame;
     //IplImage* framecopy;
     int stop =0;
+    double cv_time;
     const char* windowname = "jda";
     capture = cvCaptureFromCAM(0);
     if (!capture)
@@ -68,8 +69,10 @@ void process_webcam_frames()
             // you can safely comment out this line if you find it unnecessary	
             //cvFlip(framecopy, framecopy, 1);
             // ...
+	    cv_time = cvGetTickCount();
             process_image(frame, 0);
-
+	    cv_time = (cvGetTickCount()-cv_time)/(cvGetTickFrequency()*1000);
+            printf("# cv_time === %f ms\n", cv_time);
             // ...
             cvShowImage(windowname, frame);
         }
