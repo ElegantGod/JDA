@@ -10,9 +10,8 @@ void process_image(IplImage* img, int draw)
 {
     IplImage* gray = cvCreateImage(cvGetSize(img), img->depth, 1);
     cvCvtColor(img, gray, CV_BGR2GRAY);
-    const int N = 10;
     jdaResult result;
-    result = jdaDetect(cascador, gray->imageData, gray->width, gray->height, 1.25, 0.1, 30, -1, -0.5);
+    result = jdaDetect(cascador, gray->imageData, gray->width, gray->height, 1.25, 0.1, 70, -1, -0.5);
     for (int i = 0; i < result.n; i++) {
         float* shape = &result.shapes[2 * result.landmark_n*i]; 
         cvRectangle(img, cvPoint(result.bboxes[3*i+0], result.bboxes[3*i+1]), cvPoint(result.bboxes[3*i+0]+result.bboxes[3*i+2], result.bboxes[3*i+1]+result.bboxes[3*i+2]), CV_RGB(0,0,255),2, 8, 0);
@@ -26,13 +25,14 @@ void process_image(IplImage* img, int draw)
         cvShowImage("jda", img);
         cvWaitKey(0);
     }
+    cvReleaseImage(&gray);
 }
 
 void process_webcam_frames()
 {
     CvCapture* capture;
     IplImage* frame;
-    IplImage* framecopy;
+    //IplImage* framecopy;
     int stop =0;
     const char* windowname = "jda";
     capture = cvCaptureFromCAM(0);
@@ -53,27 +53,29 @@ void process_webcam_frames()
         else
             frame = cvRetrieveFrame(capture,1);
         if(!frame || key=='q')
+	{
             stop = 1;
+	    printf("stop===%d\n", stop);
+	}
         else
         {
             // we mustn't tamper with internal OpenCV buffers
-            if(!framecopy)
-                framecopy = cvCreateImage(cvSize(frame->width, frame->height), frame->depth, frame->nChannels);
-            cvCopy(frame, framecopy, 0);
+            //if(!framecopy)
+            //    framecopy = cvCreateImage(cvSize(frame->width, frame->height), frame->depth, frame->nChannels);
+            //cvCopy(frame, framecopy, 1);
 
             // webcam outputs mirrored frames (at least on my machines)
-            // you can safely comment out this line if you find it unnecessary
-            cvFlip(framecopy, framecopy, 1);
+            // you can safely comment out this line if you find it unnecessary	
+            //cvFlip(framecopy, framecopy, 1);
+            // ...
+            process_image(frame, 0);
 
             // ...
-            process_image(framecopy, 0);
-
-            // ...
-            cvShowImage(windowname, framecopy);
+            cvShowImage(windowname, frame);
         }
     }
 
-    cvReleaseImage(&framecopy);
+    //cvReleaseImage(&framecopy);
     cvReleaseCapture(&capture);
     cvDestroyWindow(windowname);
 }
