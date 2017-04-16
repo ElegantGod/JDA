@@ -1,18 +1,5 @@
 #pragma once
 
-#ifdef _MSC_VER
-#ifdef JDA_EXPORTS
-#define JDA_API __declspec(dllexport)
-#else
-#define JDA_API __declspec(dllimport)
-#endif
-#else
-#define JDA_API
-#endif
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /*! \brief result */
 typedef struct {
@@ -28,8 +15,8 @@ typedef struct {
  * \param model   model file
  * \return        cascador, NULL if failed
  */
-JDA_API void *jdaCascadorCreateDouble(const char *model);
-JDA_API void *jdaCascadorCreateFloat(const char *model);
+void *jdaCascadorCreateDouble(const char *model);
+void *jdaCascadorCreateFloat(const char *model);
 
 /*!
  * \brief serialize model to a binary file
@@ -38,13 +25,13 @@ JDA_API void *jdaCascadorCreateFloat(const char *model);
  * \param cascador  jda cascador
  * \param model     model file
  */
-JDA_API void jdaCascadorSerializeTo(void *cascador, const char *model);
+void jdaCascadorSerializeTo(void *cascador, const char *model);
 
 /*!
  * \brief release jda cascador
  * \param cascador  jda cascador
  */
-JDA_API void jdaCascadorRelease(void *cascador);
+void jdaCascadorRelease(void *cascador);
 
 /*!
  * \brief detect face
@@ -59,14 +46,12 @@ JDA_API void jdaCascadorRelease(void *cascador);
  * \param th        final score threshold, usually -0.5 ~ 0.5
  * \return          detect result
  */
-JDA_API jdaResult jdaDetect(void *cascador, unsigned char *data, int width, int height, \
+jdaResult jdaDetect(void *cascador, unsigned char *data, int width, int height, \
                             float scale, float step, int min_size, int max_size, float th);
 
 /*!
  * \brief release detection result memory
  */
-JDA_API void jdaResultRelease(jdaResult result);
+void jdaResultRelease(jdaResult result);
 
-#ifdef __cplusplus
-}
-#endif
+

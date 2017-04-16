@@ -6,9 +6,6 @@
 #include <stdbool.h> // C99 needed
 #include "jda.h"
 
-#ifdef _MSC_VER
-#define inline __inline
-#endif
 
 /*!
  * \brief jda global constance
