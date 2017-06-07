@@ -312,8 +312,8 @@ static jdaResult jdaNms(jdaResult result) {
   return merged;
 }
 
-static jdaResult jdaInternalDetect(jdaCascador *cascador, jdaImage o, jdaImage h, jdaImage q, \
-                                   float scale, float step, int min_size, int max_size, float th) {
+static jdaResult jdaInternalDetect(jdaCascador *cascador, jdaImage o, \
+                                   float scale, float step_scale, int min_size, int max_size, float th) {
   int win_size = 24; // fixed initial window size
   max_size = JDA_MIN(max_size, o.w);
   max_size = JDA_MIN(max_size, o.h);
@@ -327,19 +327,19 @@ static jdaResult jdaInternalDetect(jdaCascador *cascador, jdaImage o, jdaImage h
 
   while (win_size < min_size) win_size *= scale;
   for (; win_size <= max_size; win_size *= scale) {
-    const int step = (int)(win_size*0.1f);
+    const int step = (int)(win_size*step_scale);
     const int x_max = o.w - win_size;
     const int y_max = o.h - win_size;
 
     int x, y;
     for (y = 0; y <= y_max; y += step) {
       for (x = 0; x <= x_max; x += step) {
-        jdaImage ps[3];
-        const float r = 1.f / sqrtf(2.f);
+        jdaImage ps[1];
+        //const float r = 1.f / sqrtf(2.f);
         ps[0].w = ps[0].h = win_size;
         ps[0].step = o.step;
         ps[0].data = &o.data[y*o.step + x]; // borrow memory
-        int h_x = (int)(x*r);
+        /*int h_x = (int)(x*r);
         int h_y = (int)(y*r);
         ps[1].w = ps[1].h = win_size;
         ps[1].step = h.step;
@@ -348,7 +348,7 @@ static jdaResult jdaInternalDetect(jdaCascador *cascador, jdaImage o, jdaImage h
         int q_y = y / 2;
         ps[2].w = ps[2].h = win_size;
         ps[2].step = q.step;
-        ps[2].data = &q.data[q_y*q.step + q_x]; // borrow memory
+        ps[2].data = &q.data[q_y*q.step + q_x]; // borrow memory*/
 
         // validate
         jdaShape shape;
@@ -371,7 +371,7 @@ static jdaResult jdaInternalDetect(jdaCascador *cascador, jdaImage o, jdaImage h
               float y1 = shape[landmark1 + 1] + node->landmark1_offset_y;
               float x2 = shape[landmark2] + node->landmark2_offset_x;
               float y2 = shape[landmark2 + 1] + node->landmark2_offset_y;
-              jdaImage *p = ps + node->scale;
+              jdaImage *p = ps;// + node->scale;
               int x1_ = (int)(x1*p->w);
               int y1_ = (int)(y1*p->w);
               int x2_ = (int)(x2*p->w);
@@ -438,12 +438,12 @@ static jdaResult jdaInternalDetect(jdaCascador *cascador, jdaImage o, jdaImage h
 // APIs
 
 jdaResult jdaDetect(void *cascador, unsigned char *data, int width, int height, \
-                    float scale, float step, int min_size, int max_size, float th) {
+                    float scale, float step_scale, int min_size, int max_size, float th) {
   jdaImage o, h, q;
   o.w = o.step = width;
   o.h = height;
   o.data = data; // borrow memory
-
+/*
   float r = 1.f / sqrtf(2.f);
   h.w = (int)(width*r);
   h.h = (int)(height*r);
@@ -452,11 +452,11 @@ jdaResult jdaDetect(void *cascador, unsigned char *data, int width, int height, 
   q.w = width / 2;
   q.h = height / 2;
   q = jdaImageResize(o, q.w, q.h);
-
+*/
   min_size = JDA_MAX(min_size, 24);
   if (max_size <= 0) max_size = JDA_MIN(o.w, o.h);
-  jdaResult result = jdaInternalDetect((jdaCascador*)cascador, o, h, q, scale, \
-                                       step, min_size, max_size, th);
+  jdaResult result = jdaInternalDetect((jdaCascador*)cascador, o, scale, \
+                                       step_scale, min_size, max_size, th);
   jdaResult merged = jdaNms(result);
   int i, j;
   for (i = 0; i < merged.n; i++) {
@@ -470,8 +470,8 @@ jdaResult jdaDetect(void *cascador, unsigned char *data, int width, int height, 
     }
   }
 
-  jdaImageRelease(&h);
-  jdaImageRelease(&q);
+//  jdaImageRelease(&h);
+//  jdaImageRelease(&q);
 
   return merged;
 }

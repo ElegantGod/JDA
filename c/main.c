@@ -11,7 +11,7 @@ void process_image(IplImage* img, int draw)
     IplImage* gray = cvCreateImage(cvGetSize(img), img->depth, 1);
     cvCvtColor(img, gray, CV_BGR2GRAY);
     jdaResult result;
-    result = jdaDetect(cascador, gray->imageData, gray->width, gray->height, 1.25, 0.1, 70, -1, -0.5);
+    result = jdaDetect(cascador, gray->imageData, gray->width, gray->height, 1.25, 0.2, 70, -1, -0.5);
     for (int i = 0; i < result.n; i++) {
         float* shape = &result.shapes[2 * result.landmark_n*i]; 
         cvRectangle(img, cvPoint(result.bboxes[3*i+0], result.bboxes[3*i+1]), cvPoint(result.bboxes[3*i+0]+result.bboxes[3*i+2], result.bboxes[3*i+1]+result.bboxes[3*i+2]), CV_RGB(0,0,255),2, 8, 0);
