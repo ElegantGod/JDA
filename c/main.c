@@ -15,6 +15,10 @@ void process_image(IplImage* img, int draw)
     for (int i = 0; i < result.n; i++) {
         float* shape = &result.shapes[2 * result.landmark_n*i]; 
         cvRectangle(img, cvPoint(result.bboxes[3*i+0], result.bboxes[3*i+1]), cvPoint(result.bboxes[3*i+0]+result.bboxes[3*i+2], result.bboxes[3*i+1]+result.bboxes[3*i+2]), CV_RGB(0,0,255),2, 8, 0);
+        for(int j = 0; j < 54; j+=2)
+        {
+            cvCircle(img, cvPoint((int)shape[j], (int)shape[j+1]), 2, CV_RGB(0,255,0), 2, 8, 0);
+        }
         char buff[200];
         sprintf(buff, "%.4lf", result.scores[i]);
     }
